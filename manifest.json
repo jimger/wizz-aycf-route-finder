@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "AYCF Route Finder",
+  "name": "AYCF Route Finder Modded",
   "description": "Simple(<1mb) Chrome extension to find all available routes on Wizz AYCF (All-You-Can-Fly). Not affiliated with Wizz Air.",
   "version": "1.4.1",
   "permissions": [

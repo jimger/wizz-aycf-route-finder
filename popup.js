@@ -362,150 +362,69 @@ function formatDate(date) {
 }
 
 function displayResults(flightsByDate, append = false) {
-  const resultsDiv = document.querySelector(".route-list");
-  if (!resultsDiv) {
-    console.error("Error: .route-list element not found in the DOM");
-    return;
-  }
+    const resultsDiv = document.querySelector('.route-list');
+    if (!resultsDiv) return;
 
-  if (!append) {
-    resultsDiv.innerHTML = "";
-  }
-
-  resultsDiv.style.fontFamily = "Arial, sans-serif";
-  resultsDiv.style.maxWidth = "600px";
-  resultsDiv.style.margin = "0 auto";
-
-  for (const [date, flights] of Object.entries(flightsByDate)) {
-    if (flights.length > 0) {
-      let dateHeader = append
-        ? resultsDiv.querySelector(`h3[data-date="${date}"]`)
-        : null;
-      let flightList = append
-        ? resultsDiv.querySelector(`ul[data-date="${date}"]`)
-        : null;
-
-      if (!dateHeader) {
-        dateHeader = document.createElement("h3");
-        dateHeader.setAttribute("data-date", date);
-        dateHeader.style.display = "flex";
-        dateHeader.style.justifyContent = "space-between";
-        dateHeader.style.alignItems = "center";
-        dateHeader.style.backgroundColor = "#f0f0f0";
-        dateHeader.style.padding = "10px";
-        dateHeader.style.borderRadius = "5px";
-
-        const dateText = document.createElement("span");
-        dateText.textContent = new Date(date).toLocaleDateString("en-US", {
-          weekday: "long",
-          day: "numeric",
-          month: "long",
-          year: "numeric",
-        });
-        dateHeader.appendChild(dateText);
-
-        const clearCacheButton = document.createElement("button");
-        clearCacheButton.textContent = "♻️ Refresh Cache";
-        clearCacheButton.style.padding = "5px 10px";
-
-        clearCacheButton.style.fontSize = "12px";
-        clearCacheButton.style.backgroundColor = "#f0f0f0";
-        clearCacheButton.style.border = "1px solid #ccc";
-        clearCacheButton.style.borderRadius = "3px";
-        clearCacheButton.style.cursor = "pointer";
-        clearCacheButton.addEventListener("click", () => {
-          const origin = document
-            .getElementById("airport-input")
-            .value.toUpperCase();
-          const cacheKey = `${origin}-${date}`;
-          clearCache(cacheKey);
-        });
-
-        dateHeader.appendChild(clearCacheButton);
-        resultsDiv.appendChild(dateHeader);
-      }
-
-      if (!flightList) {
-        flightList = document.createElement("ul");
-        flightList.setAttribute("data-date", date);
-        flightList.style.listStyleType = "none";
-        flightList.style.padding = "0";
-        resultsDiv.appendChild(flightList);
-      }
-
-      const flightsToProcess = append ? [flights[flights.length - 1]] : flights;
-
-      for (const flight of flightsToProcess) {
-        const flightItem = document.createElement("li");
-        flightItem.style.marginBottom = "15px";
-        flightItem.style.padding = "10px";
-        flightItem.style.border = "1px solid #ddd";
-        flightItem.style.borderRadius = "5px";
-        flightItem.style.display = "flex";
-        flightItem.style.flexDirection = "column";
-        flightItem.style.gap = "5px";
-
-        const routeDiv = document.createElement("div");
-        routeDiv.textContent = flight.route;
-        routeDiv.style.fontWeight = "bold";
-        routeDiv.style.marginBottom = "5px";
-
-        const detailsDiv = document.createElement("div");
-        detailsDiv.style.display = "flex";
-        detailsDiv.style.justifyContent = "space-between";
-
-        const departureDiv = document.createElement("div");
-        departureDiv.textContent = `✈️ Departure: ${flight.departure}`;
-
-        const arrivalDiv = document.createElement("div");
-        arrivalDiv.textContent = `🛬 Arrival: ${flight.arrival}`;
-
-        const durationDiv = document.createElement("div");
-        durationDiv.textContent = `⏱️ Duration: ${flight.duration}`;
-
-        detailsDiv.appendChild(departureDiv);
-        detailsDiv.appendChild(arrivalDiv);
-        detailsDiv.appendChild(durationDiv);
-
-        flightItem.appendChild(routeDiv);
-        flightItem.appendChild(detailsDiv);
-
-        const origin = document
-          .getElementById("airport-input")
-          .value.toUpperCase();
-        const returnCacheKey = `${origin}-${date}-return-${flight.route}`;
-        const cachedReturnData = localStorage.getItem(returnCacheKey);
-
-        if (!cachedReturnData) {
-          const findReturnButton = document.createElement("button");
-          findReturnButton.textContent = "Find Return";
-          findReturnButton.style.width = "100px";
-          findReturnButton.classList.add(
-            "button",
-            "is-small",
-            "is-primary",
-            "mt-2",
-            "has-text-white",
-            "has-text-weight-bold",
-            "is-size-7"
-          );
-          findReturnButton.addEventListener("click", () => {
-            flight.element = flightItem;
-            findReturnFlight(flight);
-            findReturnButton.remove();
-          });
-          flightItem.appendChild(findReturnButton);
-        } else if (cachedReturnData) {
-          const { results: returnFlights } = JSON.parse(cachedReturnData);
-          flight.element = flightItem;
-          displayReturnFlights(flight, returnFlights);
-        }
-
-        flightList.appendChild(flightItem);
-        flight.element = flightItem;
-      }
+    if (!append) {
+        resultsDiv.innerHTML = '';
     }
-  }
+
+    for (const [date, flights] of Object.entries(flightsByDate)) {
+        if (flights.length > 0) {
+            const dateHeader = document.createElement('h3');
+            dateHeader.textContent = `Flights on ${date}`;
+            resultsDiv.appendChild(dateHeader);
+
+            const flightList = document.createElement('ul');
+            flightList.style.listStyleType = 'none';
+            flightList.style.padding = '0';
+
+            flights.forEach(flight => {
+                const flightItem = document.createElement('li');
+                flightItem.style.marginBottom = '15px';
+                flightItem.style.padding = '10px';
+                flightItem.style.border = '1px solid #ddd';
+                flightItem.style.borderRadius = '5px';
+
+                const routeDiv = document.createElement('div');
+                routeDiv.textContent = `Route: ${flight.route}`;
+                routeDiv.classList.add('route');
+                routeDiv.style.fontWeight = 'bold';
+
+                const dateDiv = document.createElement('div');
+                dateDiv.textContent = `Date: ${flight.date}`;
+                dateDiv.classList.add('date');
+
+                const departureDiv = document.createElement('div');
+                departureDiv.textContent = `Departure: ${flight.departure}`;
+                departureDiv.classList.add('departure');
+
+                const arrivalDiv = document.createElement('div');
+                arrivalDiv.textContent = `Arrival: ${flight.arrival}`;
+                arrivalDiv.classList.add('arrival');
+
+                const durationDiv = document.createElement('div');
+                durationDiv.textContent = `Duration: ${flight.duration}`;
+                durationDiv.classList.add('duration');
+
+                // Compute and display the correct duration
+                const computedDurationDiv = document.createElement('div');
+                const computedDuration = computeDuration(flight.departure, flight.arrival);
+                computedDurationDiv.textContent = `Computed Duration: ${computedDuration}`;
+                computedDurationDiv.classList.add('computed-duration');
+
+                flightItem.appendChild(routeDiv);
+                flightItem.appendChild(dateDiv);
+                flightItem.appendChild(departureDiv);
+                flightItem.appendChild(arrivalDiv);
+                flightItem.appendChild(durationDiv);
+                flightItem.appendChild(computedDurationDiv); // Add computed duration
+                flightList.appendChild(flightItem);
+            });
+
+            resultsDiv.appendChild(flightList);
+        }
+    }
 }
 
 async function findReturnFlight(outboundFlight) {
@@ -1006,22 +925,170 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-document.addEventListener("DOMContentLoaded", function () {
-  const dateSelect = document.getElementById("date-select");
-  const today = new Date();
 
-  for (let i = 0; i < 4; i++) {
-    const date = new Date(today);
-    date.setDate(today.getDate() + i);
+function displayResults(flightsByDate, append = false) {
+    const resultsDiv = document.querySelector('.route-list');
+    if (!resultsDiv) return;
 
-    const option = document.createElement("option");
-    option.value = date.toISOString().split("T")[0];
-    option.textContent = date.toLocaleDateString("en-US", {
-      weekday: "long",
-      month: "short",
-      day: "numeric",
+    if (!append) {
+        resultsDiv.innerHTML = '';
+    }
+
+    for (const [date, flights] of Object.entries(flightsByDate)) {
+        if (flights.length > 0) {
+            const dateHeader = document.createElement('h3');
+            dateHeader.textContent = `Flights on ${date}`;
+            resultsDiv.appendChild(dateHeader);
+
+            const flightList = document.createElement('ul');
+            flightList.style.listStyleType = 'none';
+            flightList.style.padding = '0';
+
+            flights.forEach(flight => {
+                const flightItem = document.createElement('li');
+                flightItem.style.marginBottom = '15px';
+                flightItem.style.padding = '10px';
+                flightItem.style.border = '1px solid #ddd';
+                flightItem.style.borderRadius = '5px';
+
+                const routeDiv = document.createElement('div');
+                routeDiv.textContent = `Route: ${flight.route}`;
+                routeDiv.classList.add('route'); // Add class for easy selection
+                routeDiv.style.fontWeight = 'bold';
+
+                const dateDiv = document.createElement('div');
+                dateDiv.textContent = `Date: ${flight.date}`;
+                dateDiv.classList.add('date'); // Add class for easy selection
+
+                const departureDiv = document.createElement('div');
+                departureDiv.textContent = `Departure: ${flight.departure}`;
+                departureDiv.classList.add('departure'); // Add class for easy selection
+
+                const arrivalDiv = document.createElement('div');
+                arrivalDiv.textContent = `Arrival: ${flight.arrival}`;
+                arrivalDiv.classList.add('arrival'); // Add class for easy selection
+
+                const durationDiv = document.createElement('div');
+                durationDiv.textContent = `Duration: ${flight.duration}`;
+                durationDiv.classList.add('duration'); // Add class for easy selection
+
+                flightItem.appendChild(routeDiv);
+                flightItem.appendChild(dateDiv);
+                flightItem.appendChild(departureDiv);
+                flightItem.appendChild(arrivalDiv);
+                flightItem.appendChild(durationDiv);
+                flightList.appendChild(flightItem);
+            });
+
+            resultsDiv.appendChild(flightList);
+        }
+    }
+}
+
+function saveResults(results) {
+    localStorage.setItem('flightResults', JSON.stringify(results));
+}
+
+function loadResults() {
+    const results = localStorage.getItem('flightResults');
+    return results ? JSON.parse(results) : [];
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const savedResults = loadResults();
+    if (savedResults.length > 0) {
+        displayResults(savedResults);
+    }
+});
+
+function getFlightData() {
+    const flights = [];
+    const flightElements = document.querySelectorAll('.route-list li');
+    flightElements.forEach(flightElement => {
+        const route = flightElement.querySelector('.route')?.textContent || 'N/A';
+        const date = flightElement.querySelector('.date')?.textContent || 'N/A';
+        const departure = flightElement.querySelector('.departure')?.textContent || 'N/A';
+        const arrival = flightElement.querySelector('.arrival')?.textContent || 'N/A';
+        const duration = flightElement.querySelector('.duration')?.textContent || 'N/A';
+
+        flights.push({ route, date, departure, arrival, duration });
+    });
+    return flights;
+}
+
+// Function to export results to JSON
+function exportToJson(data) {
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'flight_results.json';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+// Function to export results to CSV
+function exportToCsv(data) {
+    const csv = data.map(flight => {
+        return `${flight.route},${flight.date},${flight.departure},${flight.arrival},${flight.duration}`;
+    }).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'flight_results.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Existing code...
+
+    // Add event listeners for export buttons
+    document.getElementById('export-json').addEventListener('click', () => {
+        const flightData = getFlightData(); // Replace with your function to get flight data
+        exportToJson(flightData);
     });
 
-    dateSelect.appendChild(option);
-  }
+    document.getElementById('export-csv').addEventListener('click', () => {
+        const flightData = getFlightData(); // Replace with your function to get flight data
+        exportToCsv(flightData);
+    });
 });
+
+
+function computeDuration(departureTime, arrivalTime) {
+    // Helper function to parse time and offset
+    function parseTimeAndOffset(timeString) {
+        // Example input: "10:00 (+02:00)"
+        const [time, offset] = timeString.split(' ');
+        const [hours, minutes] = time.split(':').map(Number);
+        const [offsetHours, offsetMinutes] = offset.slice(1, -1).split(':').map(Number);
+        return { hours, minutes, offsetHours, offsetMinutes };
+    }
+
+    // Parse departure and arrival times
+    const departure = parseTimeAndOffset(departureTime);
+    const arrival = parseTimeAndOffset(arrivalTime);
+
+    // Convert departure and arrival times to UTC
+    const departureUTC = new Date();
+    departureUTC.setUTCHours(departure.hours - departure.offsetHours, departure.minutes - departure.offsetMinutes, 0, 0);
+
+    const arrivalUTC = new Date();
+    arrivalUTC.setUTCHours(arrival.hours - arrival.offsetHours, arrival.minutes - arrival.offsetMinutes, 0, 0);
+
+    // Handle cases where the arrival is on the next day
+    if (arrivalUTC < departureUTC) {
+        arrivalUTC.setDate(arrivalUTC.getDate() + 1);
+    }
+
+    // Calculate the duration in milliseconds
+    const durationMs = arrivalUTC - departureUTC;
+
+    // Convert duration to hours and minutes
+    const durationHours = Math.floor(durationMs / (1000 * 60 * 60));
+    const durationMinutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
+
+    return `${durationHours}h ${durationMinutes}m`;
+}
